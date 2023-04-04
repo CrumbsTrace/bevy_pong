@@ -18,17 +18,9 @@ const WALL_THICKNESS: f32 = 20.0;
 //Paddle definitions
 const PADDLE_SIZE: Vec3 = Vec3::new(20.0, 100.0, 1.0);
 const PADDLE_SPEED: f32 = 500.0;
-const GAP_BETWEEN_WALL_AND_PADDLE: f32 = 5.0;
-const LEFT_PADDLE_POSITION: Vec3 = Vec3::new(
-    LEFT_WALL + WALL_THICKNESS + GAP_BETWEEN_WALL_AND_PADDLE,
-    0.0,
-    1.0,
-);
-const RIGHT_PADDLE_POSITION: Vec3 = Vec3::new(
-    RIGHT_WALL - WALL_THICKNESS - GAP_BETWEEN_WALL_AND_PADDLE,
-    0.0,
-    1.0,
-);
+const PADDLE_WALL_GAP: f32 = 5.0;
+const LEFT_PADDLE_POSITION: Vec2 = Vec2::new(LEFT_WALL + WALL_THICKNESS + PADDLE_WALL_GAP, 0.0);
+const RIGHT_PADDLE_POSITION: Vec2 = Vec2::new(RIGHT_WALL - WALL_THICKNESS - PADDLE_WALL_GAP, 0.0);
 
 //Ball definitions
 const BALL_START_POSITION: Vec3 = Vec3::new(0.0, 0.0, 0.0);
@@ -43,7 +35,6 @@ const WALL_COLOR: Color = Color::rgb(0.5, 0.5, 0.5);
 
 const SCOREBOARD_TEXT_COLOR: Color = Color::rgb(0.8, 0.8, 0.8);
 const SCOREBOARD_FONT_SIZE: f32 = 40.0;
-const TEXT_COLOR: Color = Color::rgb(0.5, 0.5, 1.0);
 
 #[derive(Component)]
 struct Ball;
@@ -72,8 +63,8 @@ enum PaddleInfo {
 impl PaddleInfo {
     fn position(&self) -> Vec3 {
         match self {
-            PaddleInfo::Left => LEFT_PADDLE_POSITION,
-            PaddleInfo::Right => RIGHT_PADDLE_POSITION,
+            PaddleInfo::Left => LEFT_PADDLE_POSITION.extend(0.0),
+            PaddleInfo::Right => RIGHT_PADDLE_POSITION.extend(0.0),
         }
     }
 
@@ -208,7 +199,6 @@ fn main() {
             )
                 .in_schedule(CoreSchedule::FixedUpdate),
         )
-        .add_system(reset_ball_direction)
         .add_system(update_scoreboard)
         .add_system(bevy::window::close_on_esc)
         .run();
@@ -295,17 +285,6 @@ fn move_paddles(
         let bottom_bound = BOTTOM_WALL + PADDLE_SIZE.y / 2.0 + WALL_THICKNESS / 2.0;
 
         transform.translation.y = new_position.clamp(bottom_bound, top_bound);
-    }
-}
-
-fn reset_ball_direction(
-    keyboard_input: Res<Input<KeyCode>>,
-    mut ball_query: Query<&mut Velocity, With<Ball>>,
-) {
-    if keyboard_input.just_pressed(KeyCode::R) {
-        for mut velocity in ball_query.iter_mut() {
-            velocity.0 = random_direction() * BALL_SPEED;
-        }
     }
 }
 
