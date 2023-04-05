@@ -9,6 +9,18 @@ use bevy::prelude::*;
 
 use plugins::{CollisionPlugin, GoalPlugin, MovementPlugin, ScoreboardPlugin, WorldBuilderPlugin};
 
+#[derive(Resource, Eq, PartialEq)]
+enum GameState {
+    Playing,
+    Paused,
+}
+
+impl GameState {
+    pub fn is_paused(&self) -> bool {
+        *self == GameState::Paused
+    }
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -18,6 +30,17 @@ fn main() {
         .add_plugin(GoalPlugin)
         .add_plugin(ScoreboardPlugin)
         .insert_resource(ClearColor(constants::BACKGROUND_COLOR))
+        .insert_resource(GameState::Playing)
+        .add_system(handle_game_state)
         .add_system(bevy::window::close_on_esc)
         .run();
+}
+
+fn handle_game_state(keyboard_input: Res<Input<KeyCode>>, mut game_state: ResMut<GameState>) {
+    if keyboard_input.just_pressed(KeyCode::Space) {
+        match *game_state {
+            GameState::Playing => *game_state = GameState::Paused,
+            GameState::Paused => *game_state = GameState::Playing,
+        }
+    }
 }

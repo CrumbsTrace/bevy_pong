@@ -4,6 +4,7 @@ use crate::components::{Ball, GoalScoredEvent, Velocity};
 use crate::constants::*;
 use crate::helpers::random_direction;
 use crate::paddle_bundle::PaddleInfo;
+use crate::GameState;
 use bevy::prelude::*;
 
 impl Plugin for GoalPlugin {
@@ -15,6 +16,7 @@ impl Plugin for GoalPlugin {
 fn check_for_goals(
     mut goal_scored_event_writer: EventWriter<GoalScoredEvent>,
     mut ball_query: Query<&Transform, With<Ball>>,
+    mut game_state: ResMut<GameState>,
 ) {
     let ball_transform = ball_query.single_mut();
     let ball_size = ball_transform.scale.truncate();
@@ -26,10 +28,12 @@ fn check_for_goals(
         goal_scored_event_writer.send(GoalScoredEvent {
             player: PaddleInfo::Right,
         });
+        *game_state = GameState::Paused;
     } else if ball_transform.translation.x + ball_size.x / 2.0 > right_bound {
         goal_scored_event_writer.send(GoalScoredEvent {
             player: PaddleInfo::Left,
         });
+        *game_state = GameState::Paused;
     }
 }
 

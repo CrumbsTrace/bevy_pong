@@ -2,6 +2,8 @@ pub struct MovementPlugin;
 
 use crate::components::{MovementKeys, Velocity};
 use crate::constants::*;
+use crate::GameState;
+
 use bevy::prelude::*;
 
 impl Plugin for MovementPlugin {
@@ -34,7 +36,11 @@ fn move_paddles(
     }
 }
 
-fn move_ball(mut ball_query: Query<(&mut Transform, &Velocity)>) {
+fn move_ball(mut ball_query: Query<(&mut Transform, &Velocity)>, game_state: Res<GameState>) {
+    if game_state.is_paused() {
+        return;
+    }
+
     for (mut transform, velocity) in ball_query.iter_mut() {
         transform.translation.x += velocity.x * TIME_STEP;
         transform.translation.y += velocity.y * TIME_STEP;
