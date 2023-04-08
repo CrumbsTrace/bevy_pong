@@ -24,3 +24,6 @@ pub struct MovementKeys {
     pub up: KeyCode,
     pub down: KeyCode,
 }
+
+#[derive(Component)]
+pub struct PauseText;

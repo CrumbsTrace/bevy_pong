@@ -2,7 +2,7 @@ pub struct MovementPlugin;
 
 use crate::components::{Ball, CollisionEvent, MovementKeys, Velocity};
 use crate::constants::*;
-use crate::GameState;
+use crate::PlayState;
 use bevy_prototype_debug_lines::DebugLines;
 
 use bevy::prelude::*;
@@ -43,7 +43,7 @@ fn move_paddles(
 fn move_ball(
     time: Res<Time>,
     mut ball_query: Query<(&mut Transform, &Velocity)>,
-    game_state: Res<GameState>,
+    game_state: Res<PlayState>,
     mut lines: ResMut<DebugLines>,
 ) {
     if game_state.is_paused() {
