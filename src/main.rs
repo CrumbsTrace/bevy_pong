@@ -6,6 +6,7 @@ mod plugins;
 mod wall_bundle;
 
 use bevy::prelude::*;
+use bevy_prototype_debug_lines::*;
 
 use plugins::{CollisionPlugin, GoalPlugin, MovementPlugin, ScoreboardPlugin, WorldBuilderPlugin};
 
@@ -24,13 +25,14 @@ impl GameState {
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugin(DebugLinesPlugin::default())
         .add_plugin(WorldBuilderPlugin)
         .add_plugin(MovementPlugin)
         .add_plugin(CollisionPlugin)
         .add_plugin(GoalPlugin)
         .add_plugin(ScoreboardPlugin)
         .insert_resource(ClearColor(constants::BACKGROUND_COLOR))
-        .insert_resource(GameState::Playing)
+        .insert_resource(GameState::Paused)
         .add_system(handle_game_state)
         .add_system(bevy::window::close_on_esc)
         .run();

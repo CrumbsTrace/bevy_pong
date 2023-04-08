@@ -15,7 +15,6 @@ impl Plugin for ScoreboardPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(setup_scoreboard)
             .insert_resource(Scoreboard { left: 0, right: 0 })
-            .add_event::<GoalScoredEvent>()
             .add_system(update_scoreboard);
     }
 }

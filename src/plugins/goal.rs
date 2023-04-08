@@ -9,7 +9,8 @@ use bevy::prelude::*;
 
 impl Plugin for GoalPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems((check_for_goals, reset_ball_on_goal.after(check_for_goals)));
+        app.add_systems((check_for_goals, reset_ball_on_goal.after(check_for_goals)))
+            .add_event::<GoalScoredEvent>();
     }
 }
 

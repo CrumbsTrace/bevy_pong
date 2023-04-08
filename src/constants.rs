@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-pub const TIME_STEP: f32 = 1.0 / 60.0;
-
 //Pong field definitions
 pub const LEFT_WALL: f32 = -450.0;
 pub const RIGHT_WALL: f32 = 450.0;

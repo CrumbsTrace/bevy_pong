@@ -1,5 +1,6 @@
 use crate::paddle_bundle::PaddleInfo;
 use bevy::prelude::*;
+use bevy::sprite::collide_aabb::Collision;
 
 #[derive(Component)]
 pub struct Ball;
@@ -12,6 +13,10 @@ pub struct Collider;
 
 pub struct GoalScoredEvent {
     pub player: PaddleInfo,
+}
+
+pub struct CollisionEvent {
+    pub collision: Collision,
 }
 
 #[derive(Component)]
