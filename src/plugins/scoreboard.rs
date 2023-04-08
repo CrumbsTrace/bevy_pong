@@ -1,6 +1,5 @@
 use crate::components::GoalScoredEvent;
 use crate::constants::*;
-use crate::paddle_bundle::PaddleInfo;
 use bevy::prelude::*;
 
 pub struct ScoreboardPlugin;
@@ -46,8 +45,8 @@ fn update_scoreboard(
 
         for event in goal_scored_events.iter() {
             match event.player {
-                PaddleInfo::Left => scoreboard.left += 1,
-                PaddleInfo::Right => scoreboard.right += 1,
+                crate::components::Player::Right => scoreboard.left += 1,
+                crate::components::Player::Left => scoreboard.right += 1,
             }
         }
 

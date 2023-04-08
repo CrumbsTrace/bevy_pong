@@ -1,9 +1,8 @@
 pub struct GoalPlugin;
 
-use crate::components::{Ball, GoalScoredEvent, Velocity};
+use crate::components::{Ball, CollisionEvent, GoalScoredEvent, Velocity};
 use crate::constants::*;
 use crate::helpers::random_direction;
-use crate::paddle_bundle::PaddleInfo;
 use crate::PlayState;
 use bevy::prelude::*;
 
@@ -16,25 +15,14 @@ impl Plugin for GoalPlugin {
 
 fn check_for_goals(
     mut goal_scored_event_writer: EventWriter<GoalScoredEvent>,
-    mut ball_query: Query<&Transform, With<Ball>>,
+    mut collision_events: EventReader<CollisionEvent>,
     mut game_state: ResMut<PlayState>,
 ) {
-    let ball_transform = ball_query.single_mut();
-    let ball_size = ball_transform.scale.truncate();
-
-    let left_bound = LEFT_PADDLE_POSITION.x - PADDLE_SIZE.x / 2.0;
-    let right_bound = RIGHT_PADDLE_POSITION.x + PADDLE_SIZE.x / 2.0;
-
-    if ball_transform.translation.x - ball_size.x / 2.0 < left_bound {
-        goal_scored_event_writer.send(GoalScoredEvent {
-            player: PaddleInfo::Right,
-        });
-        *game_state = PlayState::Paused;
-    } else if ball_transform.translation.x + ball_size.x / 2.0 > right_bound {
-        goal_scored_event_writer.send(GoalScoredEvent {
-            player: PaddleInfo::Left,
-        });
-        *game_state = PlayState::Paused;
+    for collision_event in collision_events.iter() {
+        if let Some(player) = collision_event.player_goal {
+            goal_scored_event_writer.send(GoalScoredEvent { player });
+            *game_state = PlayState::Paused;
+        }
     }
 }
 

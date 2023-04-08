@@ -10,7 +10,7 @@ pub const WALL_THICKNESS: f32 = 20.0;
 //Paddle definitions
 pub const PADDLE_SIZE: Vec3 = Vec3::new(20.0, 100.0, 1.0);
 pub const PADDLE_SPEED: f32 = 500.0;
-pub const PADDLE_WALL_GAP: f32 = 5.0;
+pub const PADDLE_WALL_GAP: f32 = 20.0;
 pub const LEFT_PADDLE_POSITION: Vec2 = Vec2::new(LEFT_WALL + WALL_THICKNESS + PADDLE_WALL_GAP, 0.0);
 pub const RIGHT_PADDLE_POSITION: Vec2 =
     Vec2::new(RIGHT_WALL - WALL_THICKNESS - PADDLE_WALL_GAP, 0.0);

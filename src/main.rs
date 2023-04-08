@@ -6,7 +6,6 @@ mod plugins;
 mod wall_bundle;
 
 use bevy::prelude::*;
-use bevy_prototype_debug_lines::*;
 
 use plugins::{
     CollisionPlugin, GoalPlugin, MovementPlugin, PausePlugin, PlayState, ScoreboardPlugin,
@@ -16,7 +15,6 @@ use plugins::{
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_plugin(DebugLinesPlugin::default())
         .add_plugin(WorldBuilderPlugin)
         .add_plugin(PausePlugin)
         .add_plugin(MovementPlugin)

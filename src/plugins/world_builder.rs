@@ -1,6 +1,6 @@
 pub struct WorldBuilderPlugin;
 
-use crate::components::{Ball, Velocity};
+use crate::components::{Ball, Player, SideWall, Velocity};
 use crate::constants::*;
 use crate::helpers::random_direction;
 use crate::paddle_bundle::{PaddleBundle, PaddleInfo};
@@ -25,8 +25,19 @@ fn setup(
     commands.spawn(PaddleBundle::new(PaddleInfo::Right));
 
     //Walls
-    commands.spawn(WallBundle::new(WallLocation::Left));
-    commands.spawn(WallBundle::new(WallLocation::Right));
+    commands.spawn((
+        WallBundle::new(WallLocation::Left),
+        SideWall {
+            player: Player::Left,
+        },
+    ));
+
+    commands.spawn((
+        WallBundle::new(WallLocation::Right),
+        SideWall {
+            player: Player::Right,
+        },
+    ));
     commands.spawn(WallBundle::new(WallLocation::Bottom));
     commands.spawn(WallBundle::new(WallLocation::Top));
 

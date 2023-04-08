@@ -3,7 +3,6 @@ pub struct MovementPlugin;
 use crate::components::{Ball, CollisionEvent, MovementKeys, Velocity};
 use crate::constants::*;
 use crate::PlayState;
-use bevy_prototype_debug_lines::DebugLines;
 
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::Collision;
@@ -44,7 +43,6 @@ fn move_ball(
     time: Res<Time>,
     mut ball_query: Query<(&mut Transform, &Velocity)>,
     game_state: Res<PlayState>,
-    mut lines: ResMut<DebugLines>,
 ) {
     if game_state.is_paused() {
         return;
@@ -53,16 +51,6 @@ fn move_ball(
     for (mut transform, velocity) in ball_query.iter_mut() {
         transform.translation.x += velocity.x * time.delta_seconds();
         transform.translation.y += velocity.y * time.delta_seconds();
-
-        let start = transform.translation;
-        let velocity_unit = velocity.normalize();
-        let end = Vec3::new(
-            start.x + velocity_unit.x * 100.0,
-            start.y + velocity_unit.y * 100.0,
-            start.z,
-        );
-        let duration = 0.0;
-        lines.line(start, end, duration);
     }
 }
 

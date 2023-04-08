@@ -1,6 +1,6 @@
 pub struct CollisionPlugin;
 
-use crate::components::{Ball, CollisionEvent};
+use crate::components::{Ball, CollisionEvent, SideWall};
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 
 use crate::components::Collider;
@@ -14,7 +14,8 @@ impl Plugin for CollisionPlugin {
 
 fn check_collisions(
     mut ball_query: Query<&Transform, With<Ball>>,
-    collider_query: Query<&Transform, With<Collider>>,
+    collider_query: Query<&Transform, (With<Collider>, Without<SideWall>)>,
+    side_wall_query: Query<(&Transform, &SideWall)>,
     mut collision_event: EventWriter<CollisionEvent>,
 ) {
     let ball_transform = ball_query.single_mut();
@@ -31,7 +32,28 @@ fn check_collisions(
         );
 
         if let Some(collision) = collision {
-            collision_event.send(CollisionEvent { collision });
+            collision_event.send(CollisionEvent {
+                collision,
+                player_goal: None,
+            });
+        }
+    }
+
+    for (side_wall_transform, side_wall) in side_wall_query.iter() {
+        let side_wall_size = side_wall_transform.scale.truncate();
+
+        let collision = collide(
+            ball_transform.translation,
+            ball_size,
+            side_wall_transform.translation,
+            side_wall_size,
+        );
+
+        if let Some(collision) = collision {
+            collision_event.send(CollisionEvent {
+                collision,
+                player_goal: Some(side_wall.player),
+            });
         }
     }
 }
