@@ -7,6 +7,8 @@ use crate::PlayState;
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::Collision;
 
+use super::world_builder::BallSpeed;
+
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems((move_paddles, move_ball, handle_bounce.before(move_ball)));
@@ -28,6 +30,10 @@ fn move_paddles(
             direction -= 1.0;
         }
 
+        if direction == 0.0 {
+            continue;
+        }
+
         let new_position =
             transform.translation.y + direction * PADDLE_SPEED * time.delta().as_secs_f32();
 
@@ -41,17 +47,25 @@ fn move_paddles(
 
 fn move_ball(
     time: Res<Time>,
-    mut ball_query: Query<(&mut Transform, &Velocity)>,
+    mut ball_query: Query<(&mut Transform, &mut Velocity), With<Ball>>,
+    mut ball_speed: ResMut<BallSpeed>,
     game_state: Res<PlayState>,
 ) {
     if game_state.is_paused() {
         return;
     }
 
-    for (mut transform, velocity) in ball_query.iter_mut() {
+    for (mut transform, mut velocity) in ball_query.iter_mut() {
         transform.translation.x += velocity.x * time.delta_seconds();
         transform.translation.y += velocity.y * time.delta_seconds();
+
+        // update velocity based on the current ball speed
+        let normalized_velocity = velocity.normalize();
+        velocity.x = ball_speed.0 * normalized_velocity.x;
+        velocity.y = ball_speed.0 * normalized_velocity.y;
     }
+
+    ball_speed.0 += BALL_ACCELERATION * time.delta_seconds();
 }
 
 fn handle_bounce(
@@ -73,16 +87,13 @@ fn handle_bounce(
                 Collision::Inside => { /* do nothing */ }
             }
 
-            // reflect velocity on the x-axis if we hit something on the x-axis
             if reflect_x {
                 ball_velocity.x = -ball_velocity.x;
             }
 
-            // reflect velocity on the y-axis if we hit something on the y-axis
             if reflect_y {
                 ball_velocity.y = -ball_velocity.y;
             }
         }
     }
-    // reflect the ball when it collides
 }

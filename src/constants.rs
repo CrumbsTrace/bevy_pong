@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+pub const RESOLUTION: (f32, f32) = (1200.0, 800.0);
+
 //Pong field definitions
 pub const LEFT_WALL: f32 = -450.0;
 pub const RIGHT_WALL: f32 = 450.0;
@@ -18,7 +20,8 @@ pub const RIGHT_PADDLE_POSITION: Vec2 =
 //Ball definitions
 pub const BALL_START_POSITION: Vec3 = Vec3::new(0.0, 0.0, 0.0);
 pub const BALL_SIZE: Vec3 = Vec3::new(20.0, 20.0, 0.0);
-pub const BALL_SPEED: f32 = 600.0;
+pub const INITIAL_BALL_SPEED: f32 = 600.0;
+pub const BALL_ACCELERATION: f32 = 20.0;
 
 //Color definitions
 pub const BACKGROUND_COLOR: Color = Color::rgb(0.04, 0.04, 0.04);

@@ -6,6 +6,8 @@ use crate::helpers::random_direction;
 use crate::PlayState;
 use bevy::prelude::*;
 
+use super::world_builder::BallSpeed;
+
 impl Plugin for GoalPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems((check_for_goals, reset_ball_on_goal.after(check_for_goals)))
@@ -29,12 +31,14 @@ fn check_for_goals(
 fn reset_ball_on_goal(
     mut goal_scored_events: EventReader<GoalScoredEvent>,
     mut ball_query: Query<(&mut Transform, &mut Velocity), With<Ball>>,
+    mut ball_speed: ResMut<BallSpeed>,
 ) {
     if !goal_scored_events.is_empty() {
         goal_scored_events.clear();
         for (mut transform, mut velocity) in ball_query.iter_mut() {
             transform.translation = BALL_START_POSITION;
-            velocity.0 = random_direction() * BALL_SPEED;
+            velocity.0 = random_direction() * INITIAL_BALL_SPEED;
+            ball_speed.0 = INITIAL_BALL_SPEED
         }
     }
 }

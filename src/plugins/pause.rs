@@ -5,7 +5,7 @@ use bevy::prelude::*;
 
 impl Plugin for PausePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems((handle_game_state, show_pause_text.after(handle_game_state)))
+        app.add_systems((handle_play_state, show_pause_text.after(handle_play_state)))
             .insert_resource(PlayState::Paused);
     }
 }
@@ -22,12 +22,9 @@ impl PlayState {
     }
 }
 
-fn handle_game_state(keyboard_input: Res<Input<KeyCode>>, mut game_state: ResMut<PlayState>) {
-    if keyboard_input.just_pressed(KeyCode::Space) {
-        match *game_state {
-            PlayState::Playing => *game_state = PlayState::Paused,
-            PlayState::Paused => *game_state = PlayState::Playing,
-        }
+fn handle_play_state(keyboard_input: Res<Input<KeyCode>>, mut play_state: ResMut<PlayState>) {
+    if play_state.is_paused() && keyboard_input.just_pressed(KeyCode::Space) {
+        *play_state = PlayState::Playing;
     }
 }
 

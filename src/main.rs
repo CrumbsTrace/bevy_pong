@@ -5,8 +5,10 @@ mod paddle_bundle;
 mod plugins;
 mod wall_bundle;
 
+// use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
+use constants::RESOLUTION;
 use plugins::{
     CollisionPlugin, GoalPlugin, MovementPlugin, PausePlugin, PlayState, ScoreboardPlugin,
     WorldBuilderPlugin,
@@ -14,7 +16,15 @@ use plugins::{
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                resolution: RESOLUTION.into(),
+                ..default()
+            }),
+            ..default()
+        }))
+        // .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        // .add_plugin(LogDiagnosticsPlugin::default())
         .add_plugin(WorldBuilderPlugin)
         .add_plugin(PausePlugin)
         .add_plugin(MovementPlugin)

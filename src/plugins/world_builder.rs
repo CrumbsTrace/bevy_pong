@@ -7,9 +7,13 @@ use crate::paddle_bundle::{PaddleBundle, PaddleInfo};
 use crate::wall_bundle::{WallBundle, WallLocation};
 use bevy::{prelude::*, sprite::MaterialMesh2dBundle};
 
+#[derive(Resource)]
+pub struct BallSpeed(pub f32);
+
 impl Plugin for WorldBuilderPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(setup);
+        app.add_startup_system(setup)
+            .insert_resource(BallSpeed(INITIAL_BALL_SPEED));
     }
 }
 
@@ -50,6 +54,6 @@ fn setup(
             ..default()
         },
         Ball,
-        Velocity(random_direction() * BALL_SPEED),
+        Velocity(random_direction() * INITIAL_BALL_SPEED),
     ));
 }
