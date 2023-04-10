@@ -19,6 +19,7 @@ fn main() {
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 resolution: RESOLUTION.into(),
+                title: "Bevy Pong".to_string(),
                 ..default()
             }),
             ..default()
