@@ -1,6 +1,6 @@
 pub struct MovementPlugin;
 
-use crate::components::{Ball, CollisionEvent, MovementKeys, Velocity};
+use crate::components::{Ball, CollisionEvent, MovementKeys, PongSystemSet, Velocity};
 use crate::constants::*;
 use crate::PlayState;
 
@@ -11,7 +11,17 @@ use super::world_builder::BallSpeed;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems((move_paddles, move_ball, handle_bounce.before(move_ball)));
+        app.add_systems(
+            (
+                move_paddles,
+                move_ball.in_set(OnUpdate(PlayState::Playing)),
+                handle_bounce
+                    .before(move_ball)
+                    .run_if(on_event::<CollisionEvent>()),
+            )
+                .in_set(PongSystemSet::GameLogic),
+        )
+        .add_event::<CollisionEvent>();
     }
 }
 
@@ -49,12 +59,7 @@ fn move_ball(
     time: Res<Time>,
     mut ball_query: Query<(&mut Transform, &mut Velocity), With<Ball>>,
     mut ball_speed: ResMut<BallSpeed>,
-    game_state: Res<PlayState>,
 ) {
-    if game_state.is_paused() {
-        return;
-    }
-
     for (mut transform, mut velocity) in ball_query.iter_mut() {
         transform.translation.x += velocity.x * time.delta_seconds();
         transform.translation.y += velocity.y * time.delta_seconds();
@@ -74,26 +79,24 @@ fn handle_bounce(
 ) {
     let mut ball_velocity = ball_query.single_mut();
 
-    if !collision_events.is_empty() {
-        for collision in collision_events.iter() {
-            let mut reflect_x = false;
-            let mut reflect_y = false;
+    for collision in collision_events.iter() {
+        let mut reflect_x = false;
+        let mut reflect_y = false;
 
-            match collision.collision {
-                Collision::Left => reflect_x = ball_velocity.x > 0.0,
-                Collision::Right => reflect_x = ball_velocity.x < 0.0,
-                Collision::Top => reflect_y = ball_velocity.y < 0.0,
-                Collision::Bottom => reflect_y = ball_velocity.y > 0.0,
-                Collision::Inside => { /* do nothing */ }
-            }
+        match collision.collision {
+            Collision::Left => reflect_x = ball_velocity.x > 0.0,
+            Collision::Right => reflect_x = ball_velocity.x < 0.0,
+            Collision::Top => reflect_y = ball_velocity.y < 0.0,
+            Collision::Bottom => reflect_y = ball_velocity.y > 0.0,
+            Collision::Inside => { /* do nothing */ }
+        }
 
-            if reflect_x {
-                ball_velocity.x = -ball_velocity.x;
-            }
+        if reflect_x {
+            ball_velocity.x = -ball_velocity.x;
+        }
 
-            if reflect_y {
-                ball_velocity.y = -ball_velocity.y;
-            }
+        if reflect_y {
+            ball_velocity.y = -ball_velocity.y;
         }
     }
 }

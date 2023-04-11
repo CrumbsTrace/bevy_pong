@@ -8,6 +8,7 @@ mod wall_bundle;
 // use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
+use components::PongSystemSet;
 use constants::RESOLUTION;
 use plugins::{
     CollisionPlugin, GoalPlugin, MovementPlugin, PausePlugin, PlayState, ScoreboardPlugin,
@@ -26,6 +27,7 @@ fn main() {
         }))
         // .add_plugin(FrameTimeDiagnosticsPlugin::default())
         // .add_plugin(LogDiagnosticsPlugin::default())
+        .configure_set(PongSystemSet::CollisionDetection.before(PongSystemSet::GameLogic))
         .add_plugin(WorldBuilderPlugin)
         .add_plugin(PausePlugin)
         .add_plugin(MovementPlugin)

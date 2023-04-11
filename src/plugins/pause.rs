@@ -5,54 +5,49 @@ use bevy::prelude::*;
 
 impl Plugin for PausePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems((handle_play_state, show_pause_text.after(handle_play_state)))
-            .insert_resource(PlayState::Paused);
+        app.add_state::<PlayState>()
+            .add_system(handle_unpause.in_set(OnUpdate(PlayState::Paused)))
+            .add_system(show_pause_text.in_schedule(OnEnter(PlayState::Paused)))
+            .add_system(hide_pause_text.in_schedule(OnExit(PlayState::Paused)));
     }
 }
 
-#[derive(Resource, Eq, PartialEq)]
+#[derive(Debug, Hash, Copy, Clone, Resource, Eq, PartialEq, Default, States)]
 pub enum PlayState {
     Playing,
+    #[default]
     Paused,
 }
 
-impl PlayState {
-    pub fn is_paused(&self) -> bool {
-        *self == PlayState::Paused
-    }
-}
-
-fn handle_play_state(keyboard_input: Res<Input<KeyCode>>, mut play_state: ResMut<PlayState>) {
-    if play_state.is_paused() && keyboard_input.just_pressed(KeyCode::Space) {
-        *play_state = PlayState::Playing;
-    }
-}
-
-fn show_pause_text(
-    mut commands: Commands,
-    game_state: Res<PlayState>,
-    asset_server: Res<AssetServer>,
-    pause_text_query: Query<Entity, With<PauseText>>,
+fn handle_unpause(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut play_state: ResMut<NextState<PlayState>>,
 ) {
-    if game_state.is_changed() && game_state.is_paused() {
-        commands.spawn((
-            Text2dBundle {
-                text: Text::from_section(
-                    "Press Space to start",
-                    TextStyle {
-                        font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                        font_size: 40.0,
-                        color: Color::WHITE,
-                    },
-                )
-                .with_alignment(TextAlignment::Center),
-                ..Default::default()
-            },
-            PauseText,
-        ));
-    } else if game_state.is_changed() && !game_state.is_paused() {
-        for entity in pause_text_query.iter() {
-            commands.entity(entity).despawn();
-        }
+    if keyboard_input.just_pressed(KeyCode::Space) {
+        play_state.set(PlayState::Playing);
+    }
+}
+
+fn show_pause_text(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section(
+                "Press Space to start",
+                TextStyle {
+                    font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                    font_size: 40.0,
+                    color: Color::WHITE,
+                },
+            )
+            .with_alignment(TextAlignment::Center),
+            ..Default::default()
+        },
+        PauseText,
+    ));
+}
+
+fn hide_pause_text(mut commands: Commands, pause_text_query: Query<Entity, With<PauseText>>) {
+    for entity in pause_text_query.iter() {
+        commands.entity(entity).despawn();
     }
 }

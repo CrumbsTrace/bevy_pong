@@ -1,13 +1,13 @@
 pub struct CollisionPlugin;
 
-use crate::components::{Ball, CollisionEvent, SideWall};
+use crate::components::{Ball, CollisionEvent, PongSystemSet, SideWall};
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 
 use crate::components::Collider;
 
 impl Plugin for CollisionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(check_collisions)
+        app.add_system(check_collisions.in_set(PongSystemSet::CollisionDetection))
             .add_event::<CollisionEvent>();
     }
 }

@@ -38,3 +38,12 @@ pub struct MovementKeys {
 
 #[derive(Component)]
 pub struct PauseText;
+
+#[derive(Component)]
+pub struct ScoreboardText;
+
+#[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
+pub enum PongSystemSet {
+    CollisionDetection,
+    GameLogic,
+}
